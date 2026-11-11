@@ -9,12 +9,13 @@ class FavoritosRepository {
 
   String get _uid => _auth.currentUser!.uid;
 
-  Future<void> adicionar(Receita receita) async {
+  Future<void> adicionar(Receita receita, {String? fotoLocal}) async {
     await _firestore.collection('favoritos').doc('${_uid}_${receita.id}').set({
       'ownerId': _uid,
       'idMeal': receita.id,
       'strMeal': receita.nome,
       'strMealThumb': receita.imagemUrl,
+      'fotoLocal': fotoLocal, // caminho da foto no celular (simulação)
       'criadoEm': FieldValue.serverTimestamp(),
     });
   }

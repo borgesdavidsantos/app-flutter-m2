@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../auth/auth_service.dart';
 import '../../favoritos/favoritos_page.dart';
 import '../../favoritos/favoritos_repository.dart';
+import '../../favoritos/imagem_service.dart';
+import '../data/receita.dart';
 import 'busca_view_model.dart';
 
 class BuscaPage extends StatefulWidget {
@@ -21,11 +23,83 @@ class BuscaPage extends StatefulWidget {
 class _BuscaPageState extends State<BuscaPage> {
   final _controller = TextEditingController();
   final _favoritosRepo = FavoritosRepository();
+  final _imagemService = ImagemService();
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _favoritar(Receita receita) async {
+    // Pergunta ao usuário de onde vem a foto
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Tirar foto'),
+              onTap: () async {
+                Navigator.pop(context);
+                try {
+                  final foto = await _imagemService.tirarFoto();
+                  await _salvar(receita, foto?.path);
+                } catch (e) {
+                  // Tratamento de permissão negada
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Permissão negada. Salvando sem foto...'),
+                      ),
+                    );
+                  }
+                  await _salvar(receita, null);
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Escolher da galeria'),
+              onTap: () async {
+                Navigator.pop(context);
+                try {
+                  final foto = await _imagemService.pegarDaGaleria();
+                  await _salvar(receita, foto?.path);
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Permissão negada. Salvando sem foto...'),
+                      ),
+                    );
+                  }
+                  await _salvar(receita, null);
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.save),
+              title: const Text('Salvar sem foto'),
+              onTap: () {
+                Navigator.pop(context);
+                _salvar(receita, null);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _salvar(Receita receita, String? fotoPath) async {
+    await _favoritosRepo.adicionar(receita, fotoLocal: fotoPath);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${receita.nome} salva nos favoritos!')),
+      );
+    }
   }
 
   Widget _corpo(BuscaEstado estado) => switch (estado) {
@@ -68,14 +142,7 @@ class _BuscaPageState extends State<BuscaPage> {
           subtitle: Text([r.categoria, r.area].whereType<String>().join(' • ')),
           trailing: IconButton(
             icon: const Icon(Icons.favorite_border),
-            onPressed: () async {
-              await _favoritosRepo.adicionar(r);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${r.nome} salva nos favoritos!')),
-                );
-              }
-            },
+            onPressed: () => _favoritar(r),
           ),
         );
       },
