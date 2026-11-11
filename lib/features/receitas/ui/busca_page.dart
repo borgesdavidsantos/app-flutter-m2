@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 
+import '../../auth/auth_service.dart';
 import 'busca_view_model.dart';
 
 class BuscaPage extends StatefulWidget {
-  const BuscaPage({super.key, required this.viewModel});
+  const BuscaPage({
+    super.key,
+    required this.viewModel,
+    required this.authService,
+  });
   final BuscaViewModel viewModel;
+  final AuthService authService;
+
   @override
   State<BuscaPage> createState() => _BuscaPageState();
 }
 
 class _BuscaPageState extends State<BuscaPage> {
   final _controller = TextEditingController();
+
   @override
   void dispose() {
     _controller.dispose();
@@ -55,6 +63,18 @@ class _BuscaPageState extends State<BuscaPage> {
                 ),
           title: Text(r.nome),
           subtitle: Text([r.categoria, r.area].whereType<String>().join(' • ')),
+          trailing: IconButton(
+            icon: const Icon(Icons.favorite_border),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Vamos implementar o favorito no banco em breve!',
+                  ),
+                ),
+              );
+            },
+          ),
         );
       },
     ),
@@ -63,7 +83,16 @@ class _BuscaPageState extends State<BuscaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Receitas favoritas')),
+      appBar: AppBar(
+        title: const Text('Receitas favoritas'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
+            onPressed: () => widget.authService.logout(),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "262179198592",
+    "project_id": "receitas-favoritas",
+    "storage_bucket": "receitas-favoritas.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:262179198592:android:bd135a81235911a2f63865",
+        "android_client_info": {
+          "package_name": "br.dev.m2.app_flutter_m2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJnnW5CDO0SKCD2dN2jt3I_innNW-uGco"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
