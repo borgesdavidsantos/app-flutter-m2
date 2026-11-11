@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'auth_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,10 +17,16 @@ class _LoginPageState extends State<LoginPage> {
   String? _erro;
 
   Future<void> _entrar({required bool cadastrar}) async {
-    setState(() { _carregando = true; _erro = null; });
+    setState(() {
+      _carregando = true;
+      _erro = null;
+    });
     try {
       if (cadastrar) {
-        await widget.authService.cadastrar(_email.text.trim(), _senha.text.trim());
+        await widget.authService.cadastrar(
+          _email.text.trim(),
+          _senha.text.trim(),
+        );
       } else {
         await widget.authService.login(_email.text.trim(), _senha.text.trim());
       }
@@ -38,18 +45,33 @@ class _LoginPageState extends State<LoginPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(controller: _email, decoration: const InputDecoration(labelText: 'E-mail'), keyboardType: TextInputType.emailAddress),
+            TextField(
+              controller: _email,
+              decoration: const InputDecoration(labelText: 'E-mail'),
+              keyboardType: TextInputType.emailAddress,
+            ),
             const SizedBox(height: 12),
-            TextField(controller: _senha, decoration: const InputDecoration(labelText: 'Senha'), obscureText: true),
+            TextField(
+              controller: _senha,
+              decoration: const InputDecoration(labelText: 'Senha'),
+              obscureText: true,
+            ),
             const SizedBox(height: 20),
-            if (_erro != null) Text(_erro!, style: const TextStyle(color: Colors.red)),
+            if (_erro != null)
+              Text(_erro!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 20),
             _carregando
                 ? const CircularProgressIndicator()
                 : Column(
                     children: [
-                      FilledButton(onPressed: () => _entrar(cadastrar: false), child: const Text('Entrar')),
-                      TextButton(onPressed: () => _entrar(cadastrar: true), child: const Text('Criar conta')),
+                      FilledButton(
+                        onPressed: () => _entrar(cadastrar: false),
+                        child: const Text('Entrar'),
+                      ),
+                      TextButton(
+                        onPressed: () => _entrar(cadastrar: true),
+                        child: const Text('Criar conta'),
+                      ),
                     ],
                   ),
           ],

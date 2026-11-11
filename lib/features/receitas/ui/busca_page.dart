@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../auth/auth_service.dart';
+import '../../favoritos/favoritos_page.dart';
+import '../../favoritos/favoritos_repository.dart';
 import 'busca_view_model.dart';
 
 class BuscaPage extends StatefulWidget {
@@ -18,6 +20,7 @@ class BuscaPage extends StatefulWidget {
 
 class _BuscaPageState extends State<BuscaPage> {
   final _controller = TextEditingController();
+  final _favoritosRepo = FavoritosRepository();
 
   @override
   void dispose() {
@@ -65,14 +68,13 @@ class _BuscaPageState extends State<BuscaPage> {
           subtitle: Text([r.categoria, r.area].whereType<String>().join(' • ')),
           trailing: IconButton(
             icon: const Icon(Icons.favorite_border),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Vamos implementar o favorito no banco em breve!',
-                  ),
-                ),
-              );
+            onPressed: () async {
+              await _favoritosRepo.adicionar(r);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${r.nome} salva nos favoritos!')),
+                );
+              }
             },
           ),
         );
@@ -84,8 +86,20 @@ class _BuscaPageState extends State<BuscaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Receitas favoritas'),
+        title: const Text('Receitas'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite),
+            tooltip: 'Meus Favoritos',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => FavoritosPage(repository: _favoritosRepo),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sair',
